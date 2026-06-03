@@ -1,0 +1,11 @@
+# LiteRealm Python Dependencies
+# Installed automatically by bootstrap.
+
+python-dotenv
+
+# --- RAG dependencies (installed when --rag cloud or --rag local) ---
+# docling                   # ML-based PDF parser (tables, layout, figures)
+# lancedb                   # vector store (file-based, no server)
+# sentence-transformers     # local embeddings
+# google-generativeai       # cloud embeddings (Gemini)
+# pypdf                     # lightweight fallback parser

@@ -1,0 +1,41 @@
+name: Build LaTeX Document
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/**/*.tex'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Tectonic
+        uses: wtfjoke/setup-tectonic@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Compile LaTeX documents
+        run: |
+          mkdir -p dist
+          for f in docs/*.tex; do
+            [ -f "$f" ] || continue
+            echo "Building $(basename "$f")..."
+            tectonic -X compile "$f"
+            pdf="$(dirname "$f")/$(basename "$f" .tex).pdf"
+            if [ -f "$pdf" ]; then
+              cp "$pdf" dist/
+              echo "Done: $(basename "$pdf") -> dist/"
+            fi
+          done
+
+      - name: Upload PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: Compiled_Document
+          path: dist/*.pdf
