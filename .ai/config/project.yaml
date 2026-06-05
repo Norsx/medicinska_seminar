@@ -3,3 +3,14 @@ type: "seminar"              # seminar | thesis | paper | homework
 latex_format: "fsb-seminar"  # fsb-seminar | fsb-thesis | fsb-paper
 rag_mode: "none"             # none | cloud | local
 brain_mode: "global"         # none | global
+
+# Obavezna polja za fsb-seminar template
+author_name: "Ivan Noršić"
+course_name: "Medicinska robotika"
+seminar_title: "Upravljački pristupi za autonomno robotsko ultrazvučno snimanje"
+seminar_title_short: "Upravljački pristupi za robotski ultrazvuk"
+professor_title: "doc. dr. sc."
+professor_name: "Lana Virag"
+include_lof: false
+include_lot: false
+max_pages: 12
