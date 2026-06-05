@@ -1,0 +1,68 @@
+% 04-vlastita-arhitektura.tex - VLASTITA ARHITEKTURA I EVALUACIJA
+
+\section{PRIJEDLOG VLASTITE ARHITEKTURE SUSTAVA I EVALUACIJSKI KRITERIJI}
+\label{sec:vlastita_arhitektura}
+
+U ovom poglavlju definiraju se ključni kriteriji za evaluaciju sustava za robotsku ehografiju te se predlaže inovativan i cjelovit koncept vlastite arhitekture autonomnog robotskog ultrazvučnog sustava koji integrira sve prethodno analizirane aspekte (upravljanje silom, vizualno vođenje, kompenzaciju disanja i sigurnosne aspekte).
+
+\subsection{Kriteriji evaluacije robotskih ultrazvučnih sustava}
+Kako bi se ocijenila uspješnost i klinička primjenjivost nekog robotskog ultrazvučnog sustava, u literaturi se definiraju sljedeći ključni kriteriji \cite{jiang2023robotic, qin2026review, vonhaxthausen2021medical}:
+\begin{enumerate}
+    \item \textbf{Stabilnost kontaktne sile:} Mjeri se kroz srednju kvadratnu pogrešku (RMSE) praćenja ciljane sile ($F_d$). Cilj je održati silu unutar $\pm 0.5$ N od zadane vrijednosti, s vremenom smirivanja (engl. \textit{settling time}) kraćim od 1 sekunde na mekom tkivu \cite{li2026robotic}.
+    \item \textbf{Kvaliteta ultrazvučne slike:} Procjenjuje se kroz indeks akustičkog kontakta (engl. \textit{acoustic coupling index}) i omjer kontrasta i šuma (CNR) na slici. Sustav mora osigurati da ključne anatomske strukture ostanu vidljive bez artefakata nastalih zbog zraka ili prekomjerne kompresije \cite{akbari2021robotic}.
+    \item \textbf{Pokrivenost područja snimanja (Coverage):} Posebno važno kod pregleda poput ultrazvuka dojke ili abdomena. Mjeri se postotak uspješno snimljene regije interesa (ROI). Cilj je 100\%-tna pokrivenost bez propuštenih zona ("slijepih pjega") \cite{ieee2023full}.
+    \item \textbf{Vrijeme snimanja:} Ukupno trajanje postupka mora biti usporedivo s ručnim pregledom (npr. manje od 5--10 minuta za cijeli organ) kako bi se osigurala propusnost u kliničkom radu.
+    \item \textbf{Sigurnost i udobnost pacijenta:} Pacijent ne smije osjećati bol. Sila pritiska nikada ne smije prijeći prag boli (obično definiran na 15--20 N za meke regije) \cite{ulrich2021probe}.
+    \item \textbf{Razina autonomije (LORA):} Sustav bi trebao težiti razinama 3 (uvjetna autonomija) ili 4 (visoka autonomija), gdje robot samostalno skenira pod nadzorom liječnika \cite{vonhaxthausen2021medical}.
+\end{enumerate}
+
+\subsection{Prijedlog vlastite arhitekture sustava (Multimodalni RUS)}
+Predlažemo novu, multimodalnu arhitekturu autonomnog robotskog ultrazvučnog sustava namijenjenu skeniranju abdomena i jetre. Blok-shema predloženog sustava sastoji se od pet ključnih, međusobno povezanih modula koji rade u zatvorenoj petlji u realnom vremenu. Prikazani moduli i njihova interakcija opisani su u nastavku.
+
+\subsubsection{Modul 1: Blok za planiranje putanje (Path Planner)}
+Ovaj modul koristi vanjsku RGB-D kameru (npr. Intel RealSense) montiranu iznad pacijenta. Kamera snima 3D oblak točaka (engl. \textit{Point Cloud}) površine pacijentova abdomena. Na temelju oblaka točaka, algoritam generira nominalnu 3D putanju skeniranja $x_0(t)$ i definira vektore normale na površinu kože u svakoj točki. Time se osigurava da je ultrazvučna sonda uvijek usmjerena okomito na kožu za maksimalnu penetraciju valova.
+
+\subsubsection{Modul 2: Modul za obradu slike i dinamičku korekciju sile (Image-Based Force Adapter)}
+UZ sonda šalje sliku u realnom vremenu u ovaj modul. Algoritam (zasnovan na konvolucijskoj neuronskoj mreži, CNN) procjenjuje kvalitetu slike i računa indeks akustičkog kontakta $Q \in [0, 1]$. 
+Ako je kvaliteta slike visoka ($Q \approx 1$), ciljana sila održava se na nominalnih $F_d = 5$ N. Ako se kvaliteta slike pogorša (npr. $Q < 0.6$), modul šalje signal za dinamičko povećanje ciljane sile prema formuli:
+\begin{equation}
+    F_d(t) = F_{nom} + K_q (1 - Q(t))
+\label{eq:dynamic_force}
+\end{equation}
+gdje je $F_{nom} = 5$ N, a $K_q = 5$ N/jedinici kvalitete, uz apsolutno ograničenje $F_d \le 12$ N iz sigurnosnih razloga.
+
+\subsubsection{Modul 3: Prilagodljivi admitancijski kontroler (Adaptive Admittance Loop)}
+Ovaj modul predstavlja srž upravljanja. Koristi podatke sa 6-osnog F/T senzora montiranog na zglobu robota. Kontroler implementira admitancijsku jednadžbu (\ref{eq:admittance}) u smjeru normale na kožu. Kako bi se spriječila nestabilnost na prijelazima s mekih na tvrde dijelove tijela (npr. rebra), modul online procjenjuje krutost okoline $K_e$ pomoću rekurzivnog algoritma najmanjih kvadrata (RLS) i dinamički prilagođava virtualno prigušenje $B_d(t)$ tako da prigušni omjer uvijek bude kritičan ($\zeta = 1.0$), sprječavajući overshoot sile.
+
+\subsubsection{Modul 4: Prediktivni kompenzator respiratornog gibanja (Respiratory Predictor)}
+Kako bi se kompenziralo disanje pacijenta bez unošenja kašnjenja u admitancijsku petlju, predlažemo prediktivni modul zasnovan na proširenom Kalmanovom filtru (EKF) ili LSTM neuronskoj mreži. Modul prati kretanje trbuha i predviđa položaj površine kože za sljedećih $50$ ms. Ova se informacija izravno pribraja referentnoj poziciji robota, omogućujući robotu da aktivno "diše" zajedno s pacijentom, čime se eliminiraju oscilacije sile uzrokovane disanjem.
+
+\subsubsection{Modul 5: Sigurnosni nadzornik (Safety Supervisor)}
+Nadzornik prati sve signale neovisno o ostatku upravljačkog koda. Prati:
+\begin{itemize}
+    \item Izmjerenu silu: ako $F > 15$ N, trenutno se aktivira povlačenje robota (engl. \textit{safety retraction}) za 5 cm unatrag u vremenu od $100$ ms.
+    \item Brzinu robota: brzina krajnjeg efektora je saturirana na $30$ mm/s.
+    \item Gubitak gela: ako slika postane crna, a sila je i dalje u granicama, sustav obustavlja skeniranje i traži potvrdu operatera.
+\end{itemize}
+
+\subsubsection{Tok podataka i upravljačkih signala u predloženom sustavu}
+Kako bi se lakše vizualizirala dinamika i međusobna povezanost predloženih modula, u Tablici \ref{tab:tok_podataka_arhitekture} detaljno je prikazan tok signala i informacija u zatvorenoj petlji u realnom vremenu.
+
+\begin{table}[H]
+\centering
+\caption{Tok podataka i upravljačkih signala u predloženom multimodalnom sustavu.}
+\label{tab:tok_podataka_arhitekture}
+\begin{tabularx}{\textwidth}{p{0.18\textwidth} p{0.24\textwidth} p{0.24\textwidth} X}
+\toprule
+\textbf{Modul} & \textbf{Ulazni signali / Senzori} & \textbf{Izlazni signali / Odredište} & \textbf{Uloga u petlji upravljanja} \\
+\midrule
+\textbf{Modul 1: Path Planner} & 3D oblak točaka (RGB-D kamera iznad pacijenta) & Nominalna 3D putanja $x_0(t)$ i normale površine & Planiranje početne geometrije skeniranja i smjera normale sonde. \\
+\textbf{Modul 2: Image Adapter} & Ultrazvučna slika u realnom vremenu (sonda) & Dinamička ciljana sila $F_d(t)$ (prema Modulu 3) & Prilagodba pritiska na temelju kvalitete akustičkog kontakta $Q$. \\
+\textbf{Modul 3: Adaptive Admittance} & Gravitacijski kompenzirana sila $F_e$ (F/T senzor) i $F_d(t)$ & Korekcija referentnog položaja $\Delta x(t)$ (prema Modulu 4) & Održavanje kontaktne sile uz online procjenu krutosti tkiva $K_e$. \\
+\textbf{Modul 4: Respiratory Predictor} & Pozicija abdomena (kamera) i korekcija $\Delta x(t)$ & Zadana pozicija robota $x_{ref}(t + \Delta t)$ & Prediktivna kompenzacija respiratornog pomaka bez kašnjenja. \\
+\textbf{Modul 5: Safety Supervisor} & Svi senzorski podaci ($F_{raw}, v_{stvarno}, Q$) & Prekid rada / sigurnosno povlačenje (aktuatori) & Nadzor nad ograničenjima sile i brzine te detekcija anomalija. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Ova predložena multimodalna arhitektura uspješno integrira napredno upravljanje silom, vizualno vođenje i robusnost na disanje, stvarajući siguran i potpuno autonoman sustav spreman za kliničku primjenu.

@@ -1,0 +1,30 @@
+% 03-robusnost-sigurnost.tex - ROBUSNOST I SIGURNOST
+
+\section{ROBUSNOST SUSTAVA I SIGURNOSNI ASPEKTI}
+\label{sec:robusnost_sigurnost}
+
+Medicinski uvjeti primjene nameću izrazito stroge zahtjeve na robusnost upravljačkih sustava i sigurnost pacijenta. Za razliku od strojeva u industriji, medicinski robot radi u dinamičkom i nepredvidivom okruženju gdje svaka pogreška u upravljanju može izravno ugroziti zdravlje pacijenta.
+
+\subsection{Problem robusnosti sustava}
+Robusnost se odnosi na sposobnost sustava da održi stabilnost i visoke performanse (konstantnu silu i kvalitetu slike) unatoč prisutnosti smetnji i neodređenosti. Ključni problemi u robotskom ultrazvuku uključuju:
+\begin{itemize}
+    \item \textbf{Kompenzacija respiratornog gibanja (gibanje pacijenta):} Pacijent tijekom snimanja diše, što uzrokuje periodičko pomicanje površine tijela (trbuh, jetra, prsni koš) amplituda i do nekoliko centimetara. Ako robot ne prati to gibanje, disanje će uzrokovati cikličke promjene sile od gubitka kontakta do opasnog pritiska. Radovi poput \cite{ieee2025robotic} razvijaju hibridne force-position okvire za kompenzaciju disanja jetre, dok \cite{ieee2025respiratory} predlaže vision-haptic fuziju za trodimenzionalnu online kompenzaciju disanja, čime se sila održava unutar odstupanja od samo 0.295 N.
+    \item \textbf{Deformabilnost mekog tkiva:} Tkiva imaju nelinearna, viskoelastična svojstva koja se mijenjaju ovisno o sili i trajanju pritiska. Online procjena krutosti tkiva, kao u admitancijskim sustavima \cite{jiang2024force} i IRL metodama \cite{ieee2024inverse}, nužna je kako bi se spriječilo "proklizavanje" ili pretjerano utiskivanje sonde u tkivo.
+    \item \textbf{Šum u mjerenju sile:} F/T senzori skloni su šumu uslijed vibracija motora robota i kabela. Korištenje filtriranja signala i adaptivnog reguliranja brzine (npr. smanjenje brzine pri povećanom šumu ili prijelazu preko zakrivljenih površina) rješava ovaj problem bez gubitka točnosti praćenja sile \cite{ieee2025survey, sae2026adaptive}.
+    \item \textbf{Promjena kvalitete slike:} Prisutnost gelova za ultrazvuk, dlaka ili promjena kuta sonde mijenja kvalitetu akustičkog prozora. Image-guided algoritmi moraju biti robusni na ove promjene i izbjegavati pogrešno interpretiranje lošeg gela kao nedostatka pritiska \cite{akbari2021robotic, twente2024comparison}.
+\end{itemize}
+
+\subsection{Utjecaj promjena anatomije i individualnih razlika pacijenata}
+Pacijenti se značajno razlikuju po anatomskoj građi, debljini potkožnog masnog tkiva, te raspodjeli i krutosti tkiva ovisno o dobi i spolu. Zbog toga se krutost okoline $K_e$ s kojom robot stupa u interakciju razlikuje za nekoliko redova veličine od pacijenta do pacijenta, pa čak i na različitim dijelovima tijela istog pacijenta (npr. prijelaz s mekog trbuha na tvrda rebra) \cite{jiang2024force}. 
+
+Upravljački algoritmi s fiksnim parametrima krutosti i prigušenja ($K_d, B_d$) postaju nestabilni pri kontaktu s tvrđim anatomskim strukturama (izazivajući oscilacije i nagli porast sile) ili prespori na mekim tkivima (gubeći akustički prozor). Prilagodljivi (adaptivni) regulatori sile rješavaju ovaj problem online procjenom krutosti tkiva u realnom vremenu (npr. pomoću rekurzivnog algoritma najmanjih kvadrata - RLS) te dinamičkim modificiranjem parametara prigušenja $B_d(t)$ kako bi se održao optimalni odziv i spriječila nestabilnost \cite{sae2026adaptive, li2026robotic}.
+
+\subsection{Sigurnosni aspekti u medicinskom okruženju}
+Sigurnost je primarni zahtjev definiran u svim medicinskim standardima za robotske sustave u izravnom kontaktu s ljudima (npr. ISO 13482, IEC 60601) \cite{vonhaxthausen2021medical}. Sustav mora integrirati višestruke razine zaštite:
+\begin{enumerate}
+    \item \textbf{Ograničenje maksimalne sile (Force Limiting):} Najvažnija sigurnosna petlja. Ako izmjerena aksijalna sila prijeđe definirani klinički prag (npr. $F_{max} = 15$ do $20\,\text{N}$), kontroler mora trenutno zaustaviti gibanje robota prema pacijentu ili aktivno povući sondu unatrag. Kvantitativna podloga za postavljanje ovih granica preuzeta je iz kliničkih istraživanja koja su proveli Ulrich i suradnici \cite{ulrich2021probe}. Mjerenjem sila koje sonografi primjenjuju tijekom ručnih opstetričkih pregleda utvrđeno je da srednja sila iznosi $9.05\,\text{N}$ (s standardnom devijacijom od $4.62\,\text{N}$), dok maksimalna sila doseže čak $37.63\,\text{N}$. Kako robotski sustav mora osigurati maksimalnu ugodu i sigurnost pacijenta, gornja granica sile u autonomnom načinu rada obično se postavlja znatno ispod tog kliničkog maksimuma, na $12$ do $15\,\text{N}$ \cite{ulrich2021probe}. U telerobotskim sustavima aktivno se koristi haptic-feedback limitator koji sprječava liječnika na master konzoli da fizički pritisne pacijenta jače od sigurnosne granice \cite{ieee2025haptic}.
+    \item \textbf{Ograničenje brzine robota (Velocity Limiting):} Brzina gibanja krajnjeg efektora prema tijelu pacijenta softverski je ograničena na niske, sigurne vrijednosti (npr. $v_{max} < 50$ mm/s) kako bi se osiguralo dovoljno vremena za reakciju sigurnosnog sustava ili operatera u slučaju neočekivanih događaja \cite{sae2026adaptive}.
+    \item \textbf{Detekcija gubitka kontakta:} Ako sila padne na nulu (gubitak kontakta s kožom), sustav ne smije nekontrolirano ubrzati prema dolje tražeći kontakt. Robot mora ući u siguran način rada (engl. \textit{safe mode}), obustaviti skeniranje i signalizirati operateru potrebu za nanošenjem gela ili ručnim pozicioniranjem \cite{akbari2021robotic}.
+    \item \textbf{Hitno zaustavljanje (Emergency Stop):} Hardverski prekidač koji je uvijek dostupan i pacijentu i liječniku. Njegovim pritiskom trenutno se isključuje napajanje motora robota, a kočnice na zglobovima se aktiviraju \cite{vonhaxthausen2021medical}.
+    \item \textbf{Interakcija s operaterom:} Robot ne radi u vakuumu; liječnik uvijek ima nadzornu ulogu. U sustavima s visokom autonomijom liječnik može u svakom trenutku preuzeti kontrolu nad robotom jednostavnim dodirom (korištenjem \textit{hand-guided} načina rada na KUKA ili UR robotima) \cite{jiang2023robotic}.
+\end{enumerate}

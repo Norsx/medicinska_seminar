@@ -1,1 +1,59 @@
-% 00-uvod — writer popunjava sadržaj.
+% 00-uvod.tex - UVOD
+
+\section{UVOD}
+\label{sec:uvod}
+
+Robotski potpomognuto ultrazvučno snimanje predstavlja jedno od najpropulzivnijih istraživačkih područja u medicinskoj robotici. Medicinska ultrazvučna dijagnostika (ehografija) ključan je i široko primjenjivan modalitet slikovne dijagnostike zbog svoje neinvazivnosti, neškodljivosti (izostanak ionizirajućeg zračenja), real-time prikaza i relativno niske cijene \cite{jiang2023robotic, vonhaxthausen2021medical}. Međutim, tradicionalni ručni pregledi pate od značajnih nedostataka: izrazito ovise o vještini i iskustvu liječnika (subjektivnost), teško se reproduciraju, te nameću ozbiljan ergonomski teret na sonografe. Istraživanja pokazuju da do 80--90\% liječnika koji se bave ultrazvukom pati od muskuloskeletnih poremećaja povezanih s radom uslijed dugotrajnih statičkih sila i neugodnih položaja tijela \cite{ulrich2021probe}. Uvođenje autonomnih i poluautonomnih robotskih ultrazvučnih sustava (engl. \textit{Robotic Ultrasound Systems} -- RUS) nudi rješenje za ove probleme standardizacijom akvizicije, smanjenjem subjektivnosti liječnika i potpunom eliminacijom fizičkog napora operatera \cite{qin2026review, ieee2025survey}.
+
+\subsection{Motivacija i relevantnost za medicinsku robotiku}
+U kontekstu medicinske robotike, razvoj robotskih ultrazvučnih sustava postavlja jedinstvene tehničke izazove. Za razliku od industrijskih aplikacija gdje robot radi u strukturiranom, krutom okruženju, u medicinskoj primjeni robot je u izravnom fizičkom kontaktu s ljudskim tijelom koje je mekano, deformabilno, individualno promjenjivo i dinamičko (uslijed disanja i pulsa) \cite{jiang2024force}. Održavanje stabilne i konstantne kontaktne sile između ultrazvučne sonde i pacijentovog tijela presudno je za:
+\begin{enumerate}
+    \item \textbf{Kvalitetu slike:} Nedovoljna sila rezultira lošim akustičkim kontaktom s kožom i degradacijom slike uslijed artefakata i šuma, dok prevelika sila uzrokuje prekomjernu kompresiju koja izobličuje anatomiju (npr. kolabiranje vena) \cite{akbari2021robotic}.
+    \item \textbf{Sigurnost pacijenta:} Prekomjerne sile mogu ozlijediti osjetljive pacijente ili uzrokovati neugodu i bol \cite{ulrich2021probe, ieee2025haptic}.
+\end{enumerate}
+Cilj ovog seminarskog rada je kritički istražiti i usporediti različite upravljačke pristupe za regulaciju kontaktne sile i položaja sonde u autonomnom robotskom ultrazvučnom snimanju na temelju najnovije literature.
+
+\subsection{Osnovni principi ultrazvučnog snimanja u medicini}
+Medicinska ultrazvučna dijagnostika temelji se na propagaciji i refleksiji visokofrekventnih zvučnih valova kroz ljudsko tkivo \cite{vonhaxthausen2021medical}. Frekvencijski raspon koji se koristi u kliničkoj praksi obično se kreće između $2$ i $15\,\text{MHz}$, ovisno o dubini penetracije i željenoj rezoluciji prikaza (niže frekvencije omogućuju dublju penetraciju, dok više frekvencije pružaju bolju prostornu rezoluciju za površinske strukture) \cite{qin2026review, mdpi2026review}.
+
+Fizikalni proces stvaranja slike odvija se kroz nekoliko ključnih koraka:
+\begin{enumerate}
+    \item \textbf{Generiranje ultrazvuka:} Ultrazvučna sonda sadrži piezoelektrične kristale. Kada se na njih primijeni izmjenični električni napon, kristali se mehanički deformiraju i vibriraju (piezoelektrični efekt), čime generiraju ultrazvučni val koji se usmjerava u tijelo pacijenta \cite{ieee2025survey}.
+    \item \textbf{Propagacija i refleksija:} Ultrazvučni val putuje kroz meka tkiva prosječnom brzinom od oko $1540\,\text{m/s}$. Kada val naiđe na granicu između dvaju tkiva različitih akustičkih impedancija ($Z = \rho c$, gdje je $\rho$ gustoća tkiva, a $c$ brzina zvuka), dio vala se reflektira natrag u obliku jeke (eha), dok se ostatak nastavlja širiti dublje u tijelo \cite{vonhaxthausen2021medical}.
+    \item \textbf{Detekcija jeke:} Reflektirana jeka vraća se do sonde i uzrokuje mehaničku deformaciju piezoelektričnih kristala, što generira električni signal (obrnuti piezoelektrični efekt) \cite{jiang2023robotic}.
+    \item \textbf{Rekonstrukcija slike:} Računalo izračunava dubinu reflektirajuće strukture na temelju vremena kašnjenja jeke ($d = \frac{c \cdot t}{2}$), dok se amplituda jeke koristi za određivanje intenziteta (svjetline) piksela na zaslonu. Ovaj najčešći oblik prikaza naziva se B-mod (engl. \textit{Brightness mode}) i omogućuje dvodimenzionalnu vizualizaciju anatomije u realnom vremenu \cite{vonhaxthausen2021medical, akbari2021robotic}.
+\end{enumerate}
+
+\subsection{Razlika između ručnog i robotski potpomognutog snimanja}
+Tradicionalni ručni pregled karakterizira ručna kontrola položaja, orijentacije i sile pritiska sonde od strane liječnika. Liječnik koristi vizualni povratni krug (gledajući zaslon) i proprioceptivni osjećaj u ruci kako bi pronašao optimalni prozor za snimanje.
+Nasuprot tome, kod robotski potpomognutog ultrazvučnog snimanja sonda je montirana na krajnji efektor (engl. \textit{end-effector}) robotskog manipulatora. Usporedne razlike prikazane su u Tablici \ref{tab:razlike_rucno_robotsko}.
+
+\begin{table}[H]
+\centering
+\caption{Usporedni prikaz ručnog i robotski potpomognutog ultrazvučnog snimanja.}
+\label{tab:razlike_rucno_robotsko}
+\begin{tabular}{p{0.3\textwidth} p{0.32\textwidth} p{0.32\textwidth}}
+\toprule
+\textbf{Karakteristika} & \textbf{Ručno snimanje} & \textbf{Robotsko snimanje} \\
+\midrule
+Ergonomska opterećenost & Visoka (muskuloskeletni poremećaji) & Niska ili nikakva za liječnika \\
+Reproducibilnost & Niska (ovisi o operateru) & Visoka (automatizirana putanja) \\
+Kontrola kontaktne sile & Subjektivna procjena liječnika & Precizna senzorska regulacija \\
+Geometrijska točnost & Ograničena ljudskom motorikom & Visoka (submilimetarska točnost) \\
+Mogućnost teleoperacije & Nemoguće (zahtijeva blizinu) & Ostvarivo (telerobotika) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Osnovne komponente robotskog sustava}
+Robotski ultrazvučni sustav sastoji se od pet ključnih međusobno povezanih komponenti \cite{vonhaxthausen2021medical, ieee2025survey}:
+\begin{enumerate}
+    \item \textbf{Robotska ruka (manipulator):} Najčešće se koriste kolaborativni roboti (engl. \textit{cobots}) sa 6 ili 7 stupnjeva slobode gibanja (DoF), koji osiguravaju siguran rad u blizini ljudi i dovoljnu fleksibilnost za praćenje zakrivljenosti tijela.
+    \item \textbf{Ultrazvučna sonda:} Pretvarač (transducer) pričvršćen na vrh robota koji emitira i prima ultrazvučne valove.
+    \item \textbf{Senzor sile i momenta (F/T senzor):} Obično montiran između prirubnice robota i sonde. Mjeri kontaktne sile i momente u 3 ili 6 osi, omogućujući upravljanje silom u zatvorenoj petlji.
+    \item \textbf{Sustav za obradu slike:} Računalo za akviziciju i analizu UZ slika u realnom vremenu, koje može procijeniti kvalitetu akustičkog kontakta ili automatski detektirati anatomske strukture.
+    \item \textbf{Sigurnosni mehanizmi:} Uključuju softverska ograničenja sile i brzine, detekciju gubitka kontakta, te hardverske osigurače poput gumba za hitno zaustavljanje (\textit{emergency stop}) i pasivnih usklađenih zglobova.
+\end{enumerate}
+
+\subsection{Pregled povezanih radova (Related Work)}
+Znanstveni radovi u području robotskog ultrazvuka fokusirani su na premošćivanje jaza između teorijskih algoritama upravljanja i njihove praktične primjene na pacijentima. Pregledni radovi poput Jiang i suradnika \cite{jiang2023robotic} klasificiraju sustave prema razinama autonomije i naglašavaju važnost regulacije sile u rasponu od 1.2 do 20 N. Qin \cite{qin2026review} i von Haxthausen i suradnici \cite{vonhaxthausen2021medical} mapiraju taksonomiju i LORA (Level of Robot Autonomy) razine, ističući kako napredni sustavi integriraju duboko učenje i računalni vid za rekonstrukciju 3D volumena organa. Istraživanja kliničkih sila koje provode Ulrich i suradnici \cite{ulrich2021probe} na trudnicama daju dragocjene podatke o tome da srednja aksijalna sila iznosi oko 9.05 N, a maksimalna dostiže čak 37.63 N, što je poslužilo kao osnova za postavljanje sigurnosnih granica u modernim sustavima. Radovi iz područja upravljanja silom, poput admitancijskih \cite{conti2010interface} i hibridnih pristupa \cite{raghavv2022autonomous}, čine osnovu za rješavanje problema gibanja tijela, što će biti detaljnije analizirano u sljedećim poglavljima.
