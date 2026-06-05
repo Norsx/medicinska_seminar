@@ -1,0 +1,13 @@
+# Path Generation and Stable Interaction Control for Autonomous Robotic Breast Ultrasound Scanning
+
+* **ID:** M4
+* **Authors:** Yangjunjian Zhou, Li Jiang, Peng Wang, Baoshan Niu, Hong Liu
+* **Year:** 2026
+* **DOI:** https://doi.org/10.1109/tase.2026.3684122
+* **Original Query:** Path Generation and Stable Interaction Control for Autonomous Robotic Breast Ultrasound Scanning
+
+## Abstract
+Ultrasound imaging is widely used for early breast tumor screening in clinical practice due to its operational simplicity and absence of radiation exposure. In this paper, a prone position autonomous breast ultrasound scanning system is developed to improve the quality and repeatability of image acquisition. A practical scanning path generation algorithm is proposed for autonomous breast scanning, which is applicable to linear, radial and anti-radial scanning protocol. Furthermore, a novel hybrid admittance control method is proposed, incorporating force-deformation characteristics of breast and a transition module to address force fluctuations and overshoot. Experimental results demonstrate that the proposed method effectively improves the smoothness and accuracy of scanning paths. During the contact collision stage, probe-breast interaction force exhibits a slow initial buildup, rapid mid-phase acceleration, and final asymptotic stabilization, which is more physiologically compatible with human interaction. Force tracking performance further validates the effectiveness of the proposed method, with maximum errors of 0.1265 N (<italic xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">T</i>=0.008 s) and 0.1810 N (<italic xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">T</i>=0.016 s), and minimum errors of -0.1120 N (<italic xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">T</i>=0.008 s) and -0.1210 N (<italic xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">T</i>=0.016 s) respectively. During the anti-radial scanning experiment, the mean confidence of the acquired images remains close to 0.5, while the confidence weighted barycentre remains around 0, indicating that the quality of ultrasound image is both good and stable.
+
+## Summary and Conclusions
+This paper addresses the design, methodology, and implementation of robotic ultrasound control. It introduces techniques to improve force regulation, visual tracking, or safety systems. Detailed analysis demonstrates the effectiveness of the proposed approaches in medical robotics.

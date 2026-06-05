@@ -13,5 +13,6 @@
 
 ## Bilješke
 
-- Literatura se nalazi u datoteci `docs/Istraživački pregled izvora – Upravljački pristupi za autonomno robotsko ultrazvučno snimanje.md`.
+- Popis literature se nalazi u datoteci `docs/Istraživački pregled izvora – Upravljački pristupi za autonomno robotsko ultrazvučno snimanje.md`.
+- Zaključci i detaljne analize iz pojedinih izvora nalaze se u datoteci `docs/Zaključci iz izvora – Upravljački pristupi za autonomno robotsko ultrazvučno snimanje.md`.
 
