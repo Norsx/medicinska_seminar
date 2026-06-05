@@ -1,0 +1,11 @@
+Christian Ulrich, Lotte N.S. Andreasen Struijk,
+Probe contact forces during obstetric ultrasound scans - A design parameter for robot-assisted ultrasound,
+International Journal of Industrial Ergonomics,
+Volume 86,
+2021,
+103224,
+ISSN 0169-8141,
+https://doi.org/10.1016/j.ergon.2021.103224.
+(https://www.sciencedirect.com/science/article/pii/S0169814121001426)
+Abstract: The ratio of experienced work-related musculoskeletal discomfort among obstetric sonographers has been reported to be as high as 80–90%. Risk factors are excessive probe contact forces long reach and static positions. Robot Assisted Ultrasound has potential to reduce the risks but in order to design such solutions, a critical need exists for a deeper understanding of the related risk factors. This involves quantification of the imposed transducer contact forces during obstetric scans. Thus, the objective of this study was to provide more accurate probe-contact force information through the recording of probe contact forces during scans of 40 pregnant women. Factors addressed were operator experience, subject Body Mass Index (BMI), foetus size, gestational age and the purpose of the scan. The BMI of the pregnant women had a significant correlation with the mean and maximum contact forces. The mean and maximum axial contact forces were 9.05 N and 37.63 N, respectively. The dependency of the applied transducer contact force versus the operator experience was found significant. The study results provide design information about required contact forces for robotic solutions to the ergonomic challenges of the sonographers.
+Keywords: Robot design; Obstetric sonography; Work-related injuries; Robotic ultrasound; Ergonomics
