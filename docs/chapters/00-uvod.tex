@@ -46,7 +46,7 @@ Mogućnost teleoperacije & Nemoguće (zahtijeva blizinu) & Ostvarivo (teleroboti
 \end{table}
 
 \subsection{Osnovne komponente robotskog sustava}
-Robotski ultrazvučni sustav sastoji se od pet ključnih međusobno povezanih komponenti \cite{vonhaxthausen2021medical, ieee2025survey}:
+Robotski ultrazvučni sustav sastoji se od pet ključnih međusobno povezanih komponenti (prikazanih na Slici \ref{fig:sustav_rus}) \cite{vonhaxthausen2021medical, ieee2025survey}:
 \begin{enumerate}
     \item \textbf{Robotska ruka (manipulator):} Najčešće se koriste kolaborativni roboti (engl. \textit{cobots}) sa 6 ili 7 stupnjeva slobode gibanja (DoF), koji osiguravaju siguran rad u blizini ljudi i dovoljnu fleksibilnost za praćenje zakrivljenosti tijela.
     \item \textbf{Ultrazvučna sonda:} Pretvarač (transducer) pričvršćen na vrh robota koji emitira i prima ultrazvučne valove.
@@ -54,6 +54,13 @@ Robotski ultrazvučni sustav sastoji se od pet ključnih međusobno povezanih ko
     \item \textbf{Sustav za obradu slike:} Računalo za akviziciju i analizu UZ slika u realnom vremenu, koje može procijeniti kvalitetu akustičkog kontakta ili automatski detektirati anatomske strukture.
     \item \textbf{Sigurnosni mehanizmi:} Uključuju softverska ograničenja sile i brzine, detekciju gubitka kontakta, te hardverske osigurače poput gumba za hitno zaustavljanje (\textit{emergency stop}) i pasivnih usklađenih zglobova.
 \end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figures/sustav_rus_6_1}
+    \caption{Uobičajena konfiguracija robotskog ultrazvučnog sustava (RUS) s integriranom robotskom rukom, F/T senzorom i sondom (prilagođeno iz \cite{vonhaxthausen2021medical}).}
+    \label{fig:sustav_rus}
+\end{figure}
 
 \subsection{Pregled povezanih radova (Related Work)}
 Znanstveni radovi u području robotskog ultrazvuka fokusirani su na premošćivanje jaza između teorijskih algoritama upravljanja i njihove praktične primjene na pacijentima. Pregledni radovi poput Jiang i suradnika \cite{jiang2023robotic} klasificiraju sustave prema razinama autonomije i naglašavaju važnost regulacije sile u rasponu od 1.2 do 20 N. Qin \cite{qin2026review} i von Haxthausen i suradnici \cite{vonhaxthausen2021medical} mapiraju taksonomiju i LORA (Level of Robot Autonomy) razine, ističući kako napredni sustavi integriraju duboko učenje i računalni vid za rekonstrukciju 3D volumena organa. Istraživanja kliničkih sila koje provode Ulrich i suradnici \cite{ulrich2021probe} na trudnicama daju dragocjene podatke o tome da srednja aksijalna sila iznosi oko 9.05 N, a maksimalna dostiže čak 37.63 N, što je poslužilo kao osnova za postavljanje sigurnosnih granica u modernim sustavima. Radovi iz područja upravljanja silom, poput admitancijskih \cite{conti2010interface} i hibridnih pristupa \cite{raghavv2022autonomous}, čine osnovu za rješavanje problema gibanja tijela, što će biti detaljnije analizirano u sljedećim poglavljima.

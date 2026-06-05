@@ -53,13 +53,20 @@ gdje su:
 Kod upravljanja impedancijom, kontroler mjeri stvarni položaj i brzinu te generira upravljačku silu $F_{cmd}$ koja se šalje aktuatorima (zahtijeva robote s kontrolom momenta u zglobovima) \cite{ieee2023hybrid}. Sustav se ponaša popustljivo (komplijantno) -- pri kontaktu s mekim tkivom sila raste proporcionalno krutosti $K_d$ i otklonu od zadane putanje.
 
 \subsection{Upravljanje admitancijom (Admittance Control)}
-Upravljanje admitancijom (engl. \textit{admittance control} ili neizravno upravljanje impedancijom temeljeno na poziciji) prikladnije je za industrijske robote koji imaju krutu strukturu i prihvaćaju isključivo pozicijske ili brzinske naredbe \cite{emergentmind2025admittance}. 
+Upravljanje admitancijom (engl. \textit{admittance control} ili neizravno upravljanje impedancijom temeljeno na poziciji) prikladnije je za industrijske robote koji imaju krutu strukturu i prihvaćaju isključivo pozicijske ili brzinske naredbe \cite{emergentmind2025admittance} (shematski prikazano na Slici \ref{fig:admittance_block}). 
 Senzor mjeri vanjsku kontaktnu silu $F_{ext}$, a kontroler rješava diferencijalnu jednadžbu virtualnog sustava masa-opruga-prigušivač kako bi izračunao korekciju putanje $\Delta x$ \cite{jiang2024force, conti2010interface}:
 \begin{equation}
     M_d \Delta\ddot{x} + B_d \Delta\dot{x} + K_d \Delta x = F_{ext} - F_d
 \label{eq:admittance}
 \end{equation}
 gdje je $F_d$ ciljana sila pritiska. Izračunata korekcija $\Delta x$ pribraja se nominalnoj putanji $x_0$, te se nova referentna pozicija $x_{ref} = x_0 + \Delta x$ šalje unutarnjem, visokofrekventnom pozicijskom kontroleru robota. Podešavanjem koeficijenata $B_d$ i $K_d$ regulira se brzina reakcije i popustljivost sustava.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/admittance_control_2_1}
+    \caption{Blok-shema admitancijskog upravljanja u kojem se izmjerena kontaktna sila koristi za generiranje korekcija putanje koje izvršava unutarnji pozicijski regulator robota (prilagođeno iz \cite{conti2010interface}).}
+    \label{fig:admittance_block}
+\end{figure}
 
 \subsection{Usporedna analiza osnovnih upravljačkih pristupa}
 Kako bismo olakšali odabir odgovarajuće strategije u dizajnu robotskih ultrazvučnih sustava, u Tablici \ref{tab:usporedba_upravljanja} dan je usporedni prikaz četiriju osnovnih upravljačkih pristupa s njihovim prednostima i ključnim ograničenjima u medicinskom kontekstu.

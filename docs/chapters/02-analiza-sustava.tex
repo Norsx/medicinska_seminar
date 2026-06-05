@@ -26,6 +26,15 @@ U tablici \ref{tab:usporedba_sustava} prikazana je detaljna usporedba triju repr
 \end{tabularx}
 \end{table}
 
+Kao primjer visokoautonomnog sustava iz Tablice \ref{tab:usporedba_sustava}, Slika \ref{fig:breast_scan} ilustrira eksperimentalni postav s KUKA LBR Med7 manipulatorom, integriranim senzorima sile i ultrazvučnom sondom, namijenjen za automatsku 3D rekonstrukciju tkiva dojke \cite{ieee2023full}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{figures/breast_scan_4_3}
+    \caption{Eksperimentalni robotski sustav visoke autonomije za automatsko skeniranje dojke temeljen na KUKA LBR Med7 manipulatoru (prilagođeno iz \cite{ieee2023full}).}
+    \label{fig:breast_scan}
+\end{figure}
+
 \subsection{Vizualno vođeno upravljanje silom (Image-Guided Control)}
 Jedan od najvećih iskoraka u robotskom ultrazvuku je integracija vizualnih informacija iz same ultrazvučne slike u zatvorenu petlju upravljanja silom. Umjesto održavanja konstantne sile bez obzira na kvalitetu slike, ovi sustavi prilagođavaju ciljanu silu $F_d$ na temelju analize slike u realnom vremenu.
 \begin{itemize}
